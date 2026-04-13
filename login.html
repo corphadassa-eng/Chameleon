@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrar | Camaleão</title>
+    <style>
+        :root {
+            --linkedin-blue: #0a66c2;
+            --linkedin-hover: #004182;
+            --bg-light: #f3f2ef;
+            --text-main: rgba(0,0,0,0.9);
+            --rainbow: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+        }
+
+        body {
+            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: white;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Topo com Logo */
+        header {
+            width: 100%;
+            max-width: 1128px;
+            padding: 20px;
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .logo-text {
+            font-size: 26px;
+            font-weight: 700;
+            background: var(--rainbow);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-decoration: none;
+        }
+
+        /* Card de Login */
+        .login-card {
+            background: white;
+            padding: 24px;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            margin-top: 40px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        p {
+            font-size: 14px;
+            color: var(--text-main);
+            margin-bottom: 24px;
+        }
+
+        /* Inputs */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid rgba(0,0,0,0.6);
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin-top: 4px;
+        }
+
+        input:focus {
+            outline: 2px solid var(--linkedin-blue);
+            border-color: transparent;
+        }
+
+        /* Botões */
+        .btn-login {
+            width: 100%;
+            background-color: var(--linkedin-blue);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 28px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-login:hover {
+            background-color: var(--linkedin-hover);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+            color: rgba(0,0,0,0.6);
+            font-size: 14px;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #cdcfd1;
+        }
+
+        .divider span { padding: 0 10px; }
+
+        .btn-google {
+            width: 100%;
+            background: white;
+            border: 1px solid rgba(0,0,0,0.6);
+            padding: 12px;
+            border-radius: 28px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-google:hover {
+            background-color: #f3f2ef;
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.6);
+        }
+
+        footer {
+            margin-top: auto;
+            padding: 20px;
+            font-size: 12px;
+            color: rgba(0,0,0,0.6);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo-text">CAMALEÃO</a>
+    </header>
+
+    <main class="login-card">
+        <h1>Entrar</h1>
+        <p>Acompanhe as melhores vagas para freelancers em BH.</p>
+
+        <form id="login-form">
+            <div class="input-group">
+                <input type="email" id="email" placeholder="E-mail ou telefone" required>
+            </div>
+            <div class="input-group">
+                <input type="password" id="password" placeholder="Senha" required>
+            </div>
+            
+            <a href="#" style="color: var(--linkedin-blue); text-decoration: none; font-weight: 600; font-size: 14px;">Esqueceu a senha?</a>
+            
+            <button type="submit" class="btn-login">Entrar</button>
+        </form>
+
+        <div class="divider"><span>ou</span></div>
+
+        <button class="btn-google" onclick="loginComGoogle()">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" width="18" alt="Google">
+            Continuar com o Google
+        </button>
+
+        <p style="text-align: center; margin-top: 20px;">
+            Novo no Camaleão? <a href="cadastro.html" style="color: var(--linkedin-blue); text-decoration: none; font-weight: 600;">Cadastre-se agora</a>
+        </p>
+    </main>
+
+    <footer>
+        © 2026 Camaleão Freelancers BH • Política de Privacidade • Contrato do Usuário
+    </footer>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+        
+        const supabaseUrl = 'https://ynrvgagobvomvpeobztv.supabase.co'
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucnZnYWdvYnZvbXZwZW9ienR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NzI3ODMsImV4cCI6MjA5MDQ0ODc4M30.ctyIxXg2EWehwBklBgKx3lU7AW-9p1J-fhRvcX-X1mI'
+        const supabase = createClient(supabaseUrl, supabaseKey)
+
+        const loginForm = document.getElementById('login-form')
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault()
+            const email = document.getElementById('email').value
+            const password = document.getElementById('password').value
+
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password,
+            })
+
+            if (error) {
+                alert("Erro ao entrar: " + error.message)
+            } else {
+                // Redireciona para o Dashboard após login
+                window.location.href = 'index.html'
+            }
+        })
+
+        window.loginComGoogle = async () => {
+            const { data, error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+            })
+        }
+    </script>
+</body>
+</html>

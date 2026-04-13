@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chameleon | Seja profissional, seja você</title>
+    <style>
+        :root {
+            --linkedin-blue: #09437e;
+            --bg-gray: #f3f2ef;
+            --border-color: #e0e0e0;
+            --rainbow: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+            --furta-cor: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+        }
+
+        body {
+            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-gray);
+            margin: 0;
+            color: rgba(0,0,0,0.9);
+        }
+
+        /* Barra de Navegação Superior Fixa */
+        nav.top-nav {
+            background-color: white;
+            border-bottom: 1px solid var(--border-color);
+            padding: 5px 20px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+        }
+
+        .nav-content {
+            width: 100%;
+            max-width: 1128px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-grow: 1;
+        }
+
+        .nav-logo {
+            width: 34px;
+            height: 34px;
+            background-color: #eee;
+            border-radius: 4px;
+            background-image: url('logo.png'); /* Coloque a imagem na mesma pasta */
+            background-size: cover;
+        }
+
+        .search-bar {
+            background-color: #edf3f8;
+            border-radius: 4px;
+            padding: 8px 15px;
+            width: 280px;
+            border: none;
+            color: #111;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: #666;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .btn-logout {
+            background: none;
+            border: 1px solid var(--linkedin-blue);
+            color: var(--linkedin-blue);
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-logout:hover {
+            background-color: #f3f7fa;
+        }
+
+        /* Layout Principal com Sidebar Fixa */
+        .container {
+            max-width: 1128px;
+            margin: 70px auto 0 auto;
+            display: grid;
+            grid-template-columns: 225px 1fr 300px;
+            gap: 24px;
+            padding: 20px;
+            align-items: start; /* Importante para o sticky funcionar */
+        }
+
+        /* Sidebar Esquerda FIXA */
+        .sidebar-left {
+            position: sticky;
+            top: 80px; /* Gruda 80px do topo da tela */
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .profile-bg {
+            height: 60px;
+            background: var(--rainbow);
+        }
+
+        .profile-info {
+            padding: 12px;
+            text-align: center;
+        }
+
+        /* Feed Central (Rola normalmente) */
+        .main-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .share-box {
+            padding: 15px;
+        }
+
+        .fake-input {
+            border: 1px solid var(--border-color);
+            border-radius: 35px;
+            padding: 12px 20px;
+            color: rgba(0,0,0,0.6);
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .post-card {
+            padding: 15px;
+        }
+
+        .post-header {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            background-color: #ccc;
+            border-radius: 50%;
+        }
+
+        .btn-cta {
+            background: var(--rainbow);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: transform 0.2s;
+        }
+
+        .btn-cta:hover {
+            transform: scale(1.02);
+        }
+
+        /* Responsividade */
+        @media (max-width: 992px) {
+            .container { grid-template-columns: 1fr; }
+            .sidebar-left { position: relative; top: 0; }
+            .sidebar-right { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <div class="nav-content">
+            <div class="nav-left">
+                <div class="nav-logo"></div>
+                <input type="text" class="search-bar" placeholder="Pesquisar...">
+            </div>
+            
+            <div class="nav-links">
+                <a href="index.html" class="nav-item">Início</a>
+                <a href="perfil.html" class="nav-item">Eu</a>
+                <button class="btn-logout" onclick="deslogar()">Sair</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        
+        <aside class="sidebar-left">
+            <div class="card">
+                <div class="profile-bg"></div>
+                <div class="profile-info">
+                    <strong style="display: block; font-size: 16px;">Chameleon</strong>
+                    <span style="font-size: 12px; color: #666;">Freelancers de BH</span>
+                    <hr style="border: 0.5px solid var(--border-color); margin: 15px 0;">
+                    <div style="text-align: left; font-size: 12px; color: #666;">
+                        Visto por: <span style="float: right; color: var(--linkedin-blue); font-weight: bold;">128</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card" style="padding: 10px; font-size: 13px;">
+                <p style="margin: 5px 0; color: var(--linkedin-blue); cursor: pointer; font-weight: 600;"># Grupos</p>
+                <p style="margin: 5px 0; color: var(--linkedin-blue); cursor: pointer; font-weight: 600;"># Eventos</p>
+            </div>
+        </aside>
+
+        <main class="main-feed">
+            <div class="card share-box">
+                <div class="fake-input">Começar uma publicação para freelancers...</div>
+                <div style="display: flex; justify-content: space-around; font-size: 14px; color: #666;">
+                    <span>📷 Foto</span> <span>🎥 Vídeo</span> <span>📅 Evento</span>
+                </div>
+            </div>
+
+            <div class="card post-card">
+                <div class="post-header">
+                    <div class="avatar" style="background: var(--furta-cor);"></div>
+                    <div>
+                        <strong style="display: block;">Empresa Tech BH</strong>
+                        <span style="font-size: 12px; color: #666;">Publicado há 2h</span>
+                    </div>
+                </div>
+                <p style="font-size: 14px;">Estamos buscando um designer freelancer para projeto de interface! Precisa dominar Figma e ser de BH para reuniões presenciais ocasionais.</p>
+                <button class="btn-cta">Candidatar-se com Chameleon</button>
+            </div>
+
+            <div class="card post-card">
+                <div class="post-header">
+                    <div class="avatar" style="background: #ccc;"></div>
+                    <div>
+                        <strong style="display: block;">Startup Inovação</strong>
+                        <span style="font-size: 12px; color: #666;">Publicado há 5h</span>
+                    </div>
+                </div>
+                <p style="font-size: 14px;">Vaga para Desenvolvedor Python (Back-end). Projeto de 3 meses focado em automação de processos atuariais.</p>
+                <button class="btn-cta">Ver detalhes</button>
+            </div>
+        </main>
+
+        <aside class="sidebar-right">
+            <div class="card" style="padding: 15px;">
+                <strong style="font-size: 16px;">Adicionar ao seu feed</strong>
+                <div style="margin-top: 15px; font-size: 14px;">
+                    <p style="font-weight: 600; margin: 8px 0;">#DesignBH</p>
+                    <p style="font-weight: 600; margin: 8px 0;">#DevMinas</p>
+                    <p style="font-weight: 600; margin: 8px 0;">#FreelanceBrasil</p>
+                </div>
+                <button style="background: none; border: 1px solid var(--linkedin-blue); color: var(--linkedin-blue); padding: 5px 15px; border-radius: 15px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px;">Seguir #</button>
+            </div>
+        </aside>
+
+    </div>
+
+    <script>
+        function deslogar() {
+            alert("Saindo do sistema...");
+            // Se estiver usando o Supabase, adicione a lógica aqui
+        }
+    </script>
+</body>
+</html>

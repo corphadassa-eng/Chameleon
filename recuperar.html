@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Senha | Chameleon</title>
+    <style>
+        :root {
+            --linkedin-blue: #0a66c2;
+            --bg-light: #f3f2ef;
+            --rainbow: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+        }
+
+        body {
+            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-light);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            padding: 30px 0;
+            font-size: 28px;
+            font-weight: 800;
+            background: var(--rainbow);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .forgot-container {
+            background: white;
+            padding: 32px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 { font-size: 24px; margin-bottom: 8px; color: rgba(0,0,0,0.9); }
+        p { font-size: 14px; color: rgba(0,0,0,0.6); margin-bottom: 24px; }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(0,0,0,0.6);
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .btn-reset {
+            width: 100%;
+            background-color: var(--linkedin-blue);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 28px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.2s;
+        }
+
+        .btn-reset:hover { background-color: #004182; }
+
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            color: var(--linkedin-blue);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>CHAMELEON</header>
+
+    <main class="forgot-container">
+        <h1>Esqueceu a senha?</h1>
+        <p>Redefina sua senha em duas etapas fáceis. Enviaremos um link de recuperação para o seu e-mail.</p>
+
+        <form id="reset-form">
+            <input type="email" id="email-reset" placeholder="E-mail" required>
+            <button type="submit" class="btn-reset">Redefinir senha</button>
+        </form>
+
+        <a href="login.html" class="back-link">Voltar para o login</a>
+    </main>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+        
+        const supabaseUrl = 'SUA_URL_SUPABASE'
+        const supabaseKey = 'SUA_CHAVE_ANON'
+        const supabase = createClient(supabaseUrl, supabaseKey)
+
+        const resetForm = document.getElementById('reset-form')
+
+        resetForm.addEventListener('submit', async (e) => {
+            e.preventDefault()
+            const email = document.getElementById('email-reset').value
+
+            const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.origin + '/nova-senha.html',
+            })
+
+            if (error) {
+                alert("Erro: " + error.message)
+            } else {
+                alert("E-mail enviado! Verifique sua caixa de entrada para continuar.")
+                window.location.href = 'login.html'
+            }
+        })
+    </script>
+</body>
+</html>

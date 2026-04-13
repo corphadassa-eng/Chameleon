@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <script src="https://unpkg.com/imask"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil | Chameleon</title>
+    <style>
+        :root {
+            --bg-gray: #f3f2ef;
+            --border-color: #e0e0e0;
+            --linkedin-blue: #0a66c2;
+            --rainbow: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+            --furta-cor: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+        }
+
+        body { font-family: -apple-system, system-ui, sans-serif; background-color: var(--bg-gray); margin: 0; padding-top: 70px; }
+        
+        nav { background: white; border-bottom: 1px solid var(--border-color); padding: 10px; position: fixed; top: 0; width: 100%; z-index: 100; display: flex; justify-content: center; }
+        .nav-content { width: 100%; max-width: 1128px; display: flex; justify-content: space-between; align-items: center; }
+
+        .container { max-width: 1128px; margin: 0 auto; display: grid; grid-template-columns: 1fr 300px; gap: 24px; padding: 0 20px; padding-bottom: 50px; }
+
+        .profile-card { background: white; border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; position: relative; }
+        .banner { height: 180px; background: var(--rainbow); transition: background 0.5s ease; }
+        
+        .pic-container { width: 150px; height: 150px; background: white; border: 4px solid white; border-radius: 50%; position: absolute; top: 100px; left: 24px; overflow: hidden; cursor: pointer; z-index: 2; }
+        .pic-container img { width: 100%; height: 100%; object-fit: cover; }
+        .overlay { position: absolute; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; opacity: 0; transition: 0.3s; }
+        .pic-container:hover .overlay { opacity: 1; }
+
+        .details { padding: 80px 24px 24px; position: relative; }
+        .edit-btn { position: absolute; top: 15px; right: 15px; border: none; background: #eee; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; font-size: 16px; z-index: 5; transition: 0.2s; }
+        .edit-btn:hover { background: #ddd; }
+        
+        .editable-field { outline: none; padding: 4px; border-radius: 4px; transition: 0.2s; min-height: 1.2em; }
+        .editing-active { border: 1px dashed var(--linkedin-blue); background: #f9f9f9; }
+
+        .tabs { display: flex; gap: 10px; padding: 15px 0; overflow-x: auto; scrollbar-width: none; }
+        .tab { padding: 8px 16px; border: 1px solid #ddd; border-radius: 20px; background: white; cursor: pointer; font-weight: 600; white-space: nowrap; }
+        .tab.active { background: var(--rainbow); color: white; border: none; }
+        .tab-add { background: none; border: 1px dashed #666; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: 600; }
+
+        .btn-save { display: none; background: var(--furta-cor); border: none; padding: 12px 30px; border-radius: 25px; font-weight: bold; cursor: pointer; margin: 20px auto; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+
+        .section-card { background: white; padding: 24px; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 12px; position: relative; }
+
+        .info-label { font-size: 11px; color: #666; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; margin-top: 10px; }
+        .info-value { font-size: 14px; color: #333; margin-bottom: 5px; min-height: 1em; }
+
+        /* FEED ESTILO INSTAGRAM */
+        .post-input-area { background: white; padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 15px; }
+        .post-input-area textarea { width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 10px; resize: none; font-family: inherit; box-sizing: border-box; outline: none; min-height: 80px; }
+        
+        #post-img-preview-container { display: none; margin-top: 10px; position: relative; width: 100px; height: 100px; }
+        #post-img-preview { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color); }
+        
+        .feed-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 15px; }
+        .post-item { background: white; aspect-ratio: 1/1; border: 1px solid #eee; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; position: relative; }
+        .post-item img { width: 100%; height: 100%; object-fit: cover; }
+        .post-item:hover { opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="nav-content">
+        <strong style="background: var(--rainbow); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 20px;">Chameleon</strong>
+        <button onclick="window.deslogar()" style="background:none; border:none; color:var(--linkedin-blue); cursor:pointer; font-weight:bold;">Sair</button>
+    </div>
+</nav>
+
+<div class="container">
+    <main>
+        <section class="profile-card">
+            <div class="banner" id="profile-banner"></div>
+            <div class="pic-container" onclick="document.getElementById('file-input').click()">
+                <img src="perfil.jpg" id="profile-img-display" alt="Foto de Perfil">
+                <div class="overlay">📷</div>
+                <input type="file" id="file-input" hidden onchange="previewImage(event)">
+            </div>
+            
+            <div class="details">
+                <button class="edit-btn" onclick="toggleEditSection(['display-name', 'display-headline'], this)">✏️</button>
+                <h1 id="display-name" class="editable-field"></h1>
+                <p id="display-headline" class="editable-field">Título Profissional</p>
+                <p style="color: #666; font-size: 14px;">Belo Horizonte, MG</p>
+                
+                <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
+
+                <div style="position: relative;">
+                    <button class="edit-btn" style="top: -10px; right: 0; width: 30px; height: 30px; font-size: 14px;" 
+                            onclick="toggleEditSection(['display-about'], this)">✏️</button>
+                    <h3 style="font-size: 16px; margin: 0 0 8px 0; color: #333;">Sobre</h3>
+                    <p id="display-about" class="editable-field" style="line-height: 1.5; color: #444; margin: 0;">Sua bio aparecerá aqui...</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="tabs" id="tabs-container" style="margin-top: 20px;"></div>
+
+        <section class="section-card" id="specialty-block" style="border-top: 4px solid var(--linkedin-blue);">
+            <button class="edit-btn" onclick="toggleEditSection(['display-sub-bio'], this)">✏️</button>
+            <h2 id="sub-bio-label" style="font-size: 18px; margin-top: 0; color: var(--linkedin-blue);">Bio da Especialidade</h2>
+            <p id="display-sub-bio" class="editable-field" style="line-height: 1.6; color: #333;">Selecione uma aba acima...</p>
+        </section>
+
+        <div class="post-input-area">
+            <textarea id="post-text" placeholder="Poste algo ou use #NomeDaAba para direcionar..."></textarea>
+            
+            <div id="post-img-preview-container">
+                <img id="post-img-preview">
+                <button onclick="removerFotoPost()" style="position: absolute; top: -5px; right: -5px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer;">×</button>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                <input type="file" id="post-file-input" hidden accept="image/*" onchange="previewImagemPost(event)">
+                <button onclick="document.getElementById('post-file-input').click()" style="background: #f0f2f5; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 14px;">📷 Foto</button>
+                <button onclick="window.criarPost()" id="btn-publicar" style="background: var(--linkedin-blue); color: white; border: none; padding: 8px 20px; border-radius: 20px; font-weight: bold; cursor: pointer;">Publicar</button>
+            </div>
+        </div>
+
+        <div id="feed-container" class="feed-grid"></div>
+
+        <div style="text-align: center;">
+            <button class="btn-save" id="save-button" onclick="saveProfile()">Salvar Dados do Perfil</button>
+        </div>
+    </main>
+
+    <aside>
+        <section class="section-card" style="margin-top: 0;">
+            <button class="edit-btn" style="width: 30px; height: 30px; font-size: 14px;" onclick="toggleEditSection(['display-phone', 'display-cpf'], this)">✏️</button>
+            <h3 style="font-size: 16px; margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Infos</h3>
+            <div class="info-label">Telefone</div>
+            <div id="display-phone" class="info-value editable-field">...</div>
+            <div class="info-label">CPF</div>
+            <div id="display-cpf" class="info-value editable-field">...</div>
+            <div class="info-label">E-mail</div>
+            <div id="display-email" class="info-value">...</div>
+        </section>
+
+        <section class="section-card">
+            <button class="edit-btn" style="width: 30px; height: 30px; font-size: 14px;" onclick="toggleEditSection(['display-languages'], this)">✏️</button>
+            <h3 style="font-size: 16px; margin: 0; margin-bottom: 10px;">Idiomas</h3>
+            <p id="display-languages" class="editable-field" style="font-size: 14px; color: #444;">...</p>
+        </section>
+    </aside>
+</div>
+
+<div id="modal-especialidade" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px;">
+        <h3 style="margin-top: 0;">Nova Especialidade</h3>
+        <input type="text" id="input-nome-subperfil" placeholder="Ex: Ciência de Dados" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin: 15px 0; box-sizing: border-box;">
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <button onclick="fecharModal()" style="background: #eee; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer;">Sair</button>
+            <button onclick="confirmarNovoSubPerfil()" style="background: var(--rainbow); color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: 600;">Criar</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+    const supabaseUrl = 'https://ynrvgagobvomvpeobztv.supabase.co'
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucnZnYWdvYnZvbXZwZW9ienR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NzI3ODMsImV4cCI6MjA5MDQ0ODc4M30.ctyIxXg2EWehwBklBgKx3lU7AW-9p1J-fhRvcX-X1mI' 
+    const supabase = createClient(supabaseUrl, supabaseKey)
+
+    let userLogado = null;
+    let subPerfis = [];
+    let subPerfilAtivoId = null; 
+    let arquivoFotoPerfil = null;
+    let arquivoFotoPost = null;
+    let perfilGeral = {};
+    let postsCache = [];
+
+    window.onload = async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return window.location.href = 'login.html';
+        userLogado = session.user;
+        await carregarDadosIniciais();
+        await carregarPosts();
+    };
+
+    async function carregarDadosIniciais() {
+        const { data: perfil } = await supabase.from('profiles').select('*').eq('id', userLogado.id).single();
+        if (perfil) {
+            perfilGeral = perfil;
+            document.getElementById('display-name').innerText = perfil.name || "Usuário sem nome";
+            document.getElementById('display-about').innerText = perfil.bio || "Sua bio aparecerá aqui...";
+            document.getElementById('display-headline').innerText = perfil.headline || "Título Profissional";
+            document.getElementById('display-phone').innerText = perfil.phone || "...";
+            document.getElementById('display-cpf').innerText = perfil.cpf || "...";
+            document.getElementById('display-languages').innerText = perfil.languages || "...";
+            document.getElementById('display-email').innerText = userLogado.email;
+            if(perfil.avatar_url) document.getElementById('profile-img-display').src = perfil.avatar_url;
+            switchSkin('main');
+        }
+        await carregarSubPerfis();
+    }
+
+    async function carregarSubPerfis() {
+        const { data } = await supabase.from('sub_profiles').select('*').eq('user_id', userLogado.id);
+        subPerfis = data || [];
+        renderTabs();
+    }
+
+    function renderTabs() {
+        const container = document.getElementById('tabs-container');
+        if(!container) return;
+        container.innerHTML = `<button id="btn-tab-main" class="tab active" onclick="switchSkin('main')">Principal</button>`;
+        subPerfis.forEach(s => {
+            container.innerHTML += `<button id="btn-tab-${s.id}" class="tab" onclick="switchSkin('sub', ${s.id})">${s.label}</button>`;
+        });
+        container.innerHTML += `<button class="tab-add" onclick="novoSubPerfil()">+ Especialidade</button>`;
+    }
+
+    // --- LÓGICA DE HASHTAGS ---
+    function normalizarParaHashtag(texto) {
+        return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '').toLowerCase();
+    }
+
+    function detectarDestinoPost(texto) {
+        if (!texto) return subPerfilAtivoId;
+        for (const sub of subPerfis) {
+            const tag = `#${normalizarParaHashtag(sub.label)}`;
+            if (new RegExp(`${tag}\\b`, 'i').test(texto)) return sub.id;
+        }
+        return subPerfilAtivoId;
+    }
+
+    // --- LÓGICA DE FEED ---
+    async function carregarPosts() {
+        const { data, error } = await supabase.from('posts').select('*').eq('user_id', userLogado.id).order('created_at', { ascending: false });
+        if(!error) { postsCache = data || []; renderizarFeed(); }
+    }
+
+    window.previewImagemPost = (e) => {
+        arquivoFotoPost = e.target.files[0];
+        if (arquivoFotoPost) {
+            document.getElementById('post-img-preview').src = URL.createObjectURL(arquivoFotoPost);
+            document.getElementById('post-img-preview-container').style.display = 'block';
+        }
+    };
+
+    window.removerFotoPost = () => {
+        arquivoFotoPost = null;
+        document.getElementById('post-file-input').value = '';
+        document.getElementById('post-img-preview-container').style.display = 'none';
+    };
+
+    window.criarPost = async () => {
+        const textInput = document.getElementById('post-text');
+        const btn = document.getElementById('btn-publicar');
+        if(!textInput.value && !arquivoFotoPost) return alert("Escreva algo ou adicione uma foto!");
+
+        btn.innerText = "Publicando...";
+        btn.disabled = true;
+
+        try {
+            let publicUrl = null;
+            const idDestino = detectarDestinoPost(textInput.value);
+
+            if (arquivoFotoPost) {
+                const fileName = `${userLogado.id}/${Date.now()}.png`;
+                await supabase.storage.from('posts').upload(fileName, arquivoFotoPost);
+                const { data: urlData } = supabase.storage.from('posts').getPublicUrl(fileName);
+                publicUrl = urlData.publicUrl;
+            }
+
+            await supabase.from('posts').insert([{
+                user_id: userLogado.id,
+                sub_profile_id: idDestino,
+                content: textInput.value,
+                image_url: publicUrl
+            }]);
+
+            textInput.value = '';
+            removerFotoPost();
+            await carregarPosts();
+            if (idDestino !== subPerfilAtivoId && idDestino !== null) alert("Post direcionado via Hashtag!");
+        } catch (err) { alert("Erro ao postar."); }
+        finally { btn.innerText = "Publicar"; btn.disabled = false; }
+    };
+
+    function renderizarFeed() {
+        const container = document.getElementById('feed-container');
+        if(!container) return;
+        container.innerHTML = '';
+        const filtrados = subPerfilAtivoId ? postsCache.filter(p => p.sub_profile_id === subPerfilAtivoId) : postsCache;
+
+        if(filtrados.length === 0) {
+            container.innerHTML = '<p style="grid-column: span 3; text-align: center; color: #999; padding: 40px;">Sem publicações aqui.</p>';
+            return;
+        }
+
+        filtrados.forEach(p => {
+            const el = document.createElement('div');
+            el.className = 'post-item';
+            if (p.image_url) {
+                el.innerHTML = `<img src="${p.image_url}" style="width: 100%; height: 100%; object-fit: cover;">`;
+            } else {
+                el.style.background = "#eee"; el.style.padding = "10px";
+                el.innerHTML = `<span style="font-size: 10px; color: #666;">${p.content}</span>`;
+            }
+            container.appendChild(el);
+        });
+    }
+
+    // --- NAVEGAÇÃO E EDIÇÃO ---
+    window.switchSkin = (mode, id = null) => {
+        encerrarEdicaoVisual(); 
+        const headline = document.getElementById('display-headline');
+        const subBio = document.getElementById('display-sub-bio');
+        const subBioLabel = document.getElementById('sub-bio-label');
+        const banner = document.getElementById('profile-banner');
+
+        if (mode === 'main') {
+            subPerfilAtivoId = null;
+            headline.innerText = perfilGeral.headline || "Título Profissional";
+            subBioLabel.innerText = "Visão Geral";
+            subBio.innerText = "Selecione uma especialidade acima para filtrar seus posts.";
+            banner.style.background = "var(--rainbow)";
+        } else {
+            const sub = subPerfis.find(s => s.id === id);
+            subPerfilAtivoId = id;
+            headline.innerText = sub.headline;
+            subBioLabel.innerText = "Especialidade: " + sub.label;
+            subBio.innerText = sub.bio;
+            banner.style.background = sub.color_theme || "var(--furta-cor)";
+        }
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        const btnAtivo = id ? document.getElementById(`btn-tab-${id}`) : document.getElementById('btn-tab-main');
+        if (btnAtivo) btnAtivo.classList.add('active');
+        renderizarFeed();
+    };
+
+    window.toggleEditSection = (fields, btn) => {
+        if (subPerfilAtivoId && (fields.includes('display-name') || fields.includes('display-about'))) return alert("Edite isso na aba Principal.");
+        const isEditing = document.getElementById(fields[0]).contentEditable === "true";
+        fields.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) { el.contentEditable = !isEditing; el.classList.toggle('editing-active', !isEditing); }
+        });
+        btn.innerText = isEditing ? "✏️" : "✅";
+        document.getElementById('save-button').style.display = isEditing ? 'none' : 'block';
+    };
+
+    function encerrarEdicaoVisual() {
+        document.querySelectorAll('.editable-field').forEach(el => { el.contentEditable = "false"; el.classList.remove('editing-active'); });
+        document.querySelectorAll('.edit-btn').forEach(b => b.innerText = "✏️");
+        document.getElementById('save-button').style.display = 'none';
+    }
+
+    window.saveProfile = async () => {
+        try {
+            if (subPerfilAtivoId) {
+                await supabase.from('sub_profiles').update({ headline: document.getElementById('display-headline').innerText, bio: document.getElementById('display-sub-bio').innerText }).eq('id', subPerfilAtivoId);
+            } else {
+                const payload = {
+                    name: document.getElementById('display-name').innerText,
+                    headline: document.getElementById('display-headline').innerText,
+                    bio: document.getElementById('display-about').innerText,
+                    languages: document.getElementById('display-languages').innerText,
+                    phone: document.getElementById('display-phone').innerText,
+                    cpf: document.getElementById('display-cpf').innerText
+                };
+                if (arquivoFotoPerfil) {
+                    const fileName = `avatar_${userLogado.id}.png`;
+                    await supabase.storage.from('avatars').upload(fileName, arquivoFotoPerfil, { upsert: true });
+                    const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(fileName);
+                    payload.avatar_url = urlData.publicUrl;
+                }
+                await supabase.from('profiles').update(payload).eq('id', userLogado.id);
+            }
+            alert("Perfil salvo!"); location.reload();
+        } catch (err) { alert("Erro ao salvar."); }
+    };
+
+    window.previewImage = (e) => { arquivoFotoPerfil = e.target.files[0]; document.getElementById('profile-img-display').src = URL.createObjectURL(arquivoFotoPerfil); document.getElementById('save-button').style.display = 'block'; };
+    window.novoSubPerfil = () => { document.getElementById('modal-especialidade').style.display = 'flex'; document.getElementById('input-nome-subperfil').focus(); };
+    window.fecharModal = () => { document.getElementById('modal-especialidade').style.display = 'none'; document.getElementById('input-nome-subperfil').value = ''; };
+    window.confirmarNovoSubPerfil = async () => {
+        const label = document.getElementById('input-nome-subperfil').value;
+        if (!label) return alert("Dê um nome!");
+        const { data, error } = await supabase.from('sub_profiles').insert([{ user_id: userLogado.id, label, headline: 'Especialista em ' + label, bio: 'Edite sua bio...', color_theme: 'var(--furta-cor)' }]).select();
+        if(!error && data[0]) { fecharModal(); await carregarSubPerfis(); setTimeout(() => { switchSkin('sub', data[0].id); }, 200); }
+    };
+    window.deslogar = async () => { await supabase.auth.signOut(); window.location.href = 'index.html'; };
+</script>
+</body>
+</html>
